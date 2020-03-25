@@ -1,0 +1,19 @@
+Instructions:
+
+    Download these data and analyse them to find the answer to the question "How does grass cover influence Eucalyptus spp. seedling recruitment?" using what ever methods you feel are most appropriate. This includes choosing which variables to use for 'grass cover' and ' eucalypt seedling recruitment'
+    Write up a summary of your methods as if you were writing it for publication in a journal.
+    When you have completd the analysis, Email Tim Parker (parkerth@whitman.edu) and Hannah Fraser (hannahsfraser@gmail.com) to let us know.
+    Fill in the survey that we will email you asking a) about some of your analytic decisions, b) to upload the description of your methods, and c) to upload all of your analysis files (e.g. R code, reformatted data, excel spreadsheet, SPSS syntax, step by step detailed instructions on all the settings you selected in your analytic software of choice)
+    Look over the manuscript as we write it up - you are invited to be a co-author but can opt out if you would prefer.
+
+NOTE: your analyses will be made public when we publish this article but we will ensure that all identifying information is removed so that no one will be able to determine which coauthor conducted which analysis
+
+Ecology and Conservation Data Information
+
+Our ecology and conservation data set is relevant to a sub-discipline of conservation research which focuses on investigating how best to revegetate private land in agricultural landscapes. These data were collected on private land under the Bush Returns program, an incentive system where participants entered into a contract with the Goulburn Broken Catchment Management Authority and received annual payments if they executed predetermined restoration activities. This particular data set is based on a passive regeneration initiative, where livestock grazing was removed from the property in the hopes that the Eucalyptus spp. overstorey would regenerate without active (and expensive) planting.
+
+Researchers conducted three rounds of surveys at 18 sites across the Goulburn Broken catchment in northern Victoria, Australia in winter and spring 2006 and autumn 2007. In each survey period, a different set of 15 x 15 m quadrats were randomly allocated across each site within 60 m of existing tree canopies. The number of quadrats at each site depended on the size of the site, ranging from four at smaller sites to 11 at larger sites. The total number of quadrats surveyed across all sites and seasons was 351. The number of Eucalytpus spp. seedlings was recorded in each quadrat along with information on the GPS location, aspect, tree canopy cover, distance to tree canopy, and position in the landscape. Ground layer plant species composition was recorded in three 0.5 x 0.5 m sub-quadrats within each quadrat. Subjective cover estimates of each species as well as bare ground, litter, rock and moss/lichen/soil crusts were recorded. Subsequently, this was augmented with information about the precipitation and solar radiation at each GPS location
+
+csv file contains the data
+
+xlsx file contains descriptions of each variable included in the data
