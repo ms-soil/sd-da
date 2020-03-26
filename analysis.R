@@ -12,3 +12,5 @@ library(tidyverse)
 d <- read_csv("data/Euc_data.csv")
 # View(d)
 head(d)
+
+### why not use: print(tbl_df(d), n=20) ? ;)
