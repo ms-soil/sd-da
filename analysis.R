@@ -131,7 +131,7 @@ d_prop %>% ggplot() +
   geom_point(aes(grass_total_beginning, euc_large_end), col = "darkblue") +
   stat_function(fun = fun4, col = "darkblue") +
   xlab("grass cover winter 2006") +
-  ylab("Euc. cover (black) & seedlings (blue) autumn 2007") +
+  ylab("Euc. cover (red) & seedlings (blue) autumn 2007") +
   theme_bw() +
   ggtitle("Influence of initial grass cover on Eucalyptus growth")
 
