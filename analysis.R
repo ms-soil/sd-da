@@ -15,7 +15,7 @@ library(gridExtra)
 read_file("instructions")
 
 #### view variable info ####
- View(read_csv("data/Eucalypt_Variables.csv"))
+View(read_csv("data/Eucalypt_Variables.csv"))
 var_info <- read.csv("data/Eucalypt_Variables.csv") #BJB likes to store it :)
 
 #### get data ####
@@ -44,7 +44,11 @@ season_view(d$`euc_sdlgs>2m`)
 
 #### relationship of grass and Euc ####
 # selecting parameters relevant to date, eucalyptus and grasses
-d_grass_euc <- d %>% select (Date, matches("Euc"), matches("grass")) %>% 
+names(d)
+###variabels to add
+#Functional groups zusammen führen (grass +Graminoids nicht vergessen & herbs & ferns & shrubs)
+#native + exotic zusammenfassen
+d_grass_euc <- d %>% select(Date, matches("Euc"), matches("grass"), matches("gramino")) %>% 
   mutate(grass_total = ExoticAnnualGrass_cover + ExoticPerennialGrass_cover + NativePerennialGrass_cover) # to get all grasses
 names(d_grass_euc)
 head(d_grass_euc)
@@ -137,5 +141,5 @@ d_prop %>% ggplot() +
 
 # original grass cover exponentially decreases eucalyptus cover and seedling abundance
 
-
+unique(d$Date)
 # - potential factors explaining are... and will be taken into account
