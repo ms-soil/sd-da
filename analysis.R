@@ -90,7 +90,8 @@ d_prop_end <- d %>% filter(Season == "Autumn 2007") %>%
   group_by(Property) %>% summarize(euc_canopy_end = mean(Euc_canopy_cover),
                                    euc_small_end = mean(euc_sdlgs0_50cm, na.rm = T),
                                    euc_medium_end = mean(`euc_sdlgs50cm-2m`, na.rm = T),
-                                   euc_large_end = mean(`euc_sdlgs>2m`))
+                                   euc_large_end = mean(`euc_sdlgs>2m`, na.rm = T)
+                                   )
 d_prop_end
 
 d_prop <- inner_join(d_prop_beginning, d_prop_end, by = "Property")
@@ -143,3 +144,6 @@ d_prop %>% ggplot() +
 
 unique(d$Date)
 # - potential factors explaining are... and will be taken into account
+
+# first linear model try here, take the three grasses to get the cover or seedlings
+
