@@ -15,7 +15,7 @@ library(gridExtra)
 read_file("instructions")
 
 #### view variable info ####
-View(read_csv("data/Eucalypt_Variables.csv"))
+#View(read_csv("data/Eucalypt_Variables.csv"))
 var_info <- read.csv("data/Eucalypt_Variables.csv") #BJB likes to store it :)
 
 #### get data ####
@@ -78,7 +78,7 @@ p_all <- grid.arrange(p1, p2, p3, p4, ncol = 2)
 #### how about original grass cover effect on final euc cover? ####
 # - get average value of cover and seedling numbers per property
 d_prop_beginning <- d %>% filter(Season == "Winter 2006") %>% 
-  mutate(grass_total_beginning = ExoticAnnualGrass_cover + ExoticPerennialGrass_cover) %>% 
+  mutate(grass_total_beginning = ExoticAnnualGrass_cover + ExoticPerennialGrass_cover + NativePerennialGrass_cover) %>% 
   group_by(Property) %>% summarize(grass_total_beginning = mean(grass_total_beginning, na.rm = T),
                                    euc_canopy_beginning  = mean(Euc_canopy_cover, na.rm = T),
                                    euc_small_beginning = mean(euc_sdlgs0_50cm, na.rm = T),
@@ -99,30 +99,30 @@ as_tibble(d_prop)
 # fitting for canopy
 x <- d_prop$grass_total_beginning
 y <- d_prop$euc_canopy_end
-fit1 <- nls(y ~ a * exp(-b * x), start=list(a = 13, b = 2), algorithm="port")
-summary(fit1) # a = 13.85; b = 0.07
-fun1 <- function(x) {13.85 * 2.718 ^ (-0.07 * x)}
+fit1 <- nls(y ~ a * exp(-b * x), start=list(a = 60, b = 2), algorithm="port")
+summary(fit1) # a = 10.48; b = 0.02
+fun1 <- function(x) {10.48 * 2.718 ^ (-0.02 * x)}
 
 # fitting for small seedling
 x <- d_prop$grass_total_beginning
 y <- d_prop$euc_small_end
 fit2 <- nls(y ~ a * exp(-b * x), start=list(a = 13, b = 2), algorithm="port")
-summary(fit2) # a = 1.41; b = 0.10
-fun2 <- function(x) {1.41 * 2.718 ^ (-0.10 * x)}
+summary(fit2) # a = 1.88; b = 0.04
+fun2 <- function(x) {1.88 * 2.718 ^ (-0.04 * x)}
 
 # fitting for medium seedling
 x <- d_prop$grass_total_beginning
 y <- d_prop$euc_medium_end
 fit3 <- nls(y ~ a * exp(-b * x), start=list(a = 13, b = 2), algorithm="port")
-summary(fit3) # a = 31.17; b = 0.61
-fun3 <- function(x) {31.17 * 2.718 ^ (-0.61 * x)}
+summary(fit3) # a = 4.73; b = 0.04
+fun3 <- function(x) {4.73 * 2.718 ^ (-0.04 * x)}
 
 # fitting for large seedling
 x <- d_prop$grass_total_beginning
 y <- d_prop$euc_large_end
 fit4 <- nls(y ~ a * exp(-b * x), start=list(a = 13, b = 2), algorithm="port")
-summary(fit4) # a = 55.01; b = 1.00
-fun4 <- function(x) {55.01 * 2.718 ^ (-1.00* x)}
+summary(fit4) # a = 13.0; b = 2.00
+fun4 <- function(x) {13.0 * 2.718 ^ (-2.00* x)}
 
 # plotting
 d_prop %>% ggplot() +
