@@ -42,7 +42,7 @@ names(d)
 str(d)
 
 #why is it not working?
-test <- d %>%
+d <- d %>%
   mutate_if(. , is.character, as.factor)
 str(test)
 names(d)
@@ -54,11 +54,10 @@ names(d)
 #Full Model
 #removing SurveyID, Property, Quadrat no, as they are "random" or blocking factors, Easting, Nothing, Euc related (as this is the response)
 full.model_Euc_cover <- lm(Euc_canopy_cover ~ Season + Aspect + Landscape_position + ExoticAnnualGrass_cover + ExoticAnnualHerb_cover +  ExoticPerennialHerb_cover + ExoticPerennialGrass_cover + ExoticShrub_cover + NativePerennialFern_cover + NativePerennialGrass_cover + NativePerennialHerb_cover + NativePerennialGraminoid_cover + NativeShrub_cover + BareGround_cover + Litter_cover + MossLichen_cover + Rock_cover + Distance_to_Eucalypt_canopy + annual_precipitation + precipitation_warmest_quarter + precipitation_coldest_quarter + PET + MrVBF + K_perc + Th_ppm + U_ppm + SRad_Jan + SRad_Jul + aridity + grass_total + herb_total + shrub_total + exotic_total + native_total , data = d)
+summary(full.model_Euc_cover)
 
-
-lm(Euc_canopy_cover ~., data=d)
 #Stepwise regression model
-step.model <- stepAIC(full.model, 
+step.model <- stepAIC(full.model_Euc_cover, 
                       direction = "both", #direction chooses the way of selection. can be "backward", "forward" or "both" 
                       trace = TRUE) #trace shows output of AIC with different parameter sets
 summary(step.model)
