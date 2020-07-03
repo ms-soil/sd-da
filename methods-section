@@ -1,1 +1,15 @@
-Analysis was done in R 3.5.1.
+Analysis was done in R 3.5.1. (curve-fitting).
+
+All grasses were combined into a separate variable (total grass cover). Also, each native grasses and exotic grasses were combined into separate variables. In order to see the general relationship between total grass cover and Eucalyptus growth, we plotted total grass cover with small, medium and large Eucalyptus seedlings as well as Eucalyptus canopy cover. 
+
+Since these relationships have a generally negative direction, (->result)
+
+but include many plots which have zero Eucalyptus, we decided to group and summarize the data on property level. Additionally, since we were interested in the effect of orginal grass cover in Winter 2016 on the growth of Eucalyptus, which was last measured in Autumn 2017, we used the data on grasses from Winter 2016 and that of Eucalyptus in Autumn 2017. Data was then plotted separately for Eucalyptus canopy cover and all seedling sizes with total grass cover, native grass cover and exotic grass cover. The effects of grass cover on all seedling sizes were consistent so we combined them into a single variable.
+
+While total grass cover and native grass cover hat no consistent effect on Eucalyptus growth, exotic grass cover did. (->result)
+
+For curve fitting with the non-linear least squarte method (nls() function), we chose an exponential decay equation of the shape a * exp(-b * x). Pearson correlation was used to assess the relationship of fitted vs. observed values.
+
+
+
+
