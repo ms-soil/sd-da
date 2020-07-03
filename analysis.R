@@ -1,63 +1,46 @@
-########################################################
-### Same Data - Different Analyst
-### Question: "How does grass cover influence Eucalyptus spp. seedling recruitment?"
-### Group: BonaRes R-Group
-### Participants: Marcus Schmidt, Paul-David Klein, Bernd J. Berauer
-### Date: wann immer wir Zeit und Lust haben
-########################################################
+#### Project info ####
+# Same Data - Different Analyst
+# Question: "How does grass cover influence Eucalyptus spp. seedling recruitment?"
+# Group: BonaRes R-Group
+# Participants: Marcus Schmidt, Bernd J. Berauer
 
-# How does grass cover influence Eucalyptus spp. seedling recruitment?
+#### library loading ####
 
 library(tidyverse)
-library(gridExtra)
+library(gridExtra) # to combine plots
+library(ggpubr) # for scatter plots
 
 #### view instructions ####
 read_file("instructions")
 
 #### view variable info ####
-#View(read_csv("data/Eucalypt_Variables.csv"))
-var_info <- read.csv("data/Eucalypt_Variables.csv") #BJB likes to store it :)
+var_info <- read.csv("data/Eucalypt_Variables.csv") 
 
-#### get data ####
+#### get and see data ####
 d <- read_csv("data/Euc_data.csv")
-# View(d)
+
 head(d)
 names(d)
 
-### why not use: print(tbl_df(d), n=20) ? ;)
-### because its more to write and maybe takes longer to calculate
-
-#### exploratory graphs ####
-#### is there a difference in seasons generally? ####
-season_view <- function(parameter){
+#### Is there an Eucalyptus difference in season? ####
+season_view <- function(parameter, title){
   d$Season <- factor(d$Season, levels = c('Winter 2006', 'Spring 2006', 'Autumn 2007'), ordered = TRUE)
   d %>% ggplot(aes(Season, parameter, fill = Season)) +
     geom_boxplot() +
-    geom_point()
+    geom_point() +
+    ggtitle(title) + theme_bw()
 }
-season_view(d$Euc_canopy_cover)
-season_view(d$euc_sdlgs0_50cm)
-season_view(d$`euc_sdlgs50cm-2m`)
-season_view(d$`euc_sdlgs>2m`)
-# Time seems to matter, only the autumn 2007 data has seedlings > 2m so we 
-# do have a timeline
+season_view(d$Euc_canopy_cover, "Euc. canopy cover")
+season_view(d$euc_sdlgs0_50cm, "Euc. small seedlings")
+season_view(d$`euc_sdlgs50cm-2m`, "Euc. medium seedlings")
+season_view(d$`euc_sdlgs>2m`, "Euc. large seedlings")
+# Result: Time matterst as only the third time (autumn 2007) shows large seedlings
 
-#### relationship of grass and Euc ####
-# selecting parameters relevant to date, eucalyptus and grasses
-names(d)
-###variabels to add
-#Functional groups zusammen führen (grass +Graminoids nicht vergessen & herbs & ferns & shrubs)
-#native + exotic zusammenfassen
+#### combine grasses ####
+
 d <- d %>%  
   mutate(aridity = (annual_precipitation / PET)*100,
-        
          grass_total = ExoticAnnualGrass_cover + ExoticPerennialGrass_cover + NativePerennialGrass_cover + NativePerennialGraminoid_cover,
-         ## below: grass only single types, maybe they explain more
-         # grass_total = ExoticAnnualGrass_cover,
-         # grass_total = ExoticPerennialGrass_cover,
-         # grass_total = NativePerennialGrass_cover,
-         # grass_total = NativePerennialGraminoid_cover,
-         
          herb_total = ExoticAnnualHerb_cover + ExoticPerennialHerb_cover + NativePerennialHerb_cover,
          shrub_total = ExoticShrub_cover + NativeShrub_cover,
          exotic_total = ExoticAnnualGrass_cover + ExoticShrub_cover + ExoticPerennialGrass_cover + ExoticAnnualHerb_cover + ExoticPerennialHerb_cover,
@@ -71,33 +54,32 @@ d <- d %>%
 names(d)
 str(d)
 
-p1 <- d %>% 
-  ggplot(aes(grass_total, Euc_canopy_cover)) +
-  geom_point() +
-  theme_bw()
+#### visualize grass cover and Euc ####
 
-p2 <- d %>% 
-  ggplot(aes(grass_total, euc_sdlg_small)) +
-  geom_point() +
-  theme_bw()
+euc_to_grass <- function(p, ytext){
+  ggscatter(d, x = "grass_total", y = p, col = "grey",
+            # add = "reg.line", conf.int = TRUE, 
+            cor.coef = TRUE, cor.method = "spearman",
+            xlab = "total grass cover (%)", ylab = ytext)
+}
 
-p3 <- d %>% 
-  ggplot(aes(grass_total, euc_sdlg_medium)) +
-  geom_point() +
-  theme_bw()
-
-p4 <- d %>% 
-  ggplot(aes(grass_total, euc_sdlg_large)) +
-  geom_point() +
-  theme_bw()
+p1 <- euc_to_grass("Euc_canopy_cover", "Euc. canopy cover (%)")
+p2 <- euc_to_grass("euc_sdlg_small",   "Euc. seedling nr. small")
+p3 <- euc_to_grass("euc_sdlg_medium",  "Euc. seedling nr. medium")
+p4 <- euc_to_grass("euc_sdlg_large",   "Euc. seedling nr. large")
 
 p_all <- grid.arrange(p1, p2, p3, p4, ncol = 2)
+# Result: Grass cover decreases with Euc presence
 
-#### original grass cover effect on final euc cover ####
+#### ORIGINAL grass cover effect on FINAL euc cover / seedling nr. per property ####
 # - get average value of cover and seedling numbers per property
 d_prop_beginning <- d %>% filter(Season == "Winter 2006") %>% 
-  mutate(grass_total_beginning = grass_total) %>% 
+  mutate(grass_total_beginning = grass_total) %>%
+  mutate(grass_exotic_beginning = ExoticAnnualGrass_cover + ExoticPerennialGrass_cover) %>%
+  mutate(grass_native_beginning = NativePerennialGrass_cover + NativePerennialGraminoid_cover) %>%
   group_by(Property) %>% summarize(grass_total_beginning = mean(grass_total_beginning, na.rm = T),
+                                   grass_exotic_beginning = mean(grass_exotic_beginning, na.rm = T),
+                                   grass_native_beginning = mean(grass_native_beginning, na.rm = T),
                                    euc_canopy_beginning  = mean(Euc_canopy_cover, na.rm = T),
                                    euc_small_beginning = mean(euc_sdlg_small, na.rm = T),
                                    euc_medium_beginning = mean(euc_sdlg_medium, na.rm = T), 
@@ -114,11 +96,9 @@ d_prop_end
 d_prop <- inner_join(d_prop_beginning, d_prop_end, by = "Property")
 as_tibble(d_prop)
 
-# View(d_prop)
-
 #### non-linear regression ####
-# fitting for canopy
-x <- d_prop$grass_total_beginning
+# fitting for Euc canopy cover
+x <- d_prop$grass_total_beginning # plot(d_prop$grass_total_beginning, d_prop$euc_canopy_end)
 y <- d_prop$euc_canopy_end
 fit1 <- nls(y ~ a * exp(-b * x), start=list(a = 15, b = 2), algorithm="port")
 summary(fit1) # 
@@ -126,8 +106,8 @@ a1 <- 10.41102
 b1 <- 0.01473
 fun1 <- function(x) {a1 * 2.718 ^ (-b1 * x)}
 
-# fitting for small seedling
-x <- d_prop$grass_total_beginning
+# fitting for small seedling nr
+x <- d_prop$grass_total_beginning # plot(d_prop$grass_total_beginning, d_prop$euc_small_end)
 y <- d_prop$euc_small_end
 fit2 <- nls(y ~ a * exp(-b * x), start=list(a = 13, b = 2), algorithm="port")
 summary(fit2)
@@ -136,8 +116,8 @@ b2 <- 0.04053
 fun2 <- function(x) {a2 * 2.718 ^ (-b2 * x)}
 
 
-# fitting for medium seedling
-x <- d_prop$grass_total_beginning
+# fitting for medium seedling nr
+x <- d_prop$grass_total_beginning # plot(d_prop$grass_total_beginning, d_prop$euc_medium_end)
 y <- d_prop$euc_medium_end
 fit3 <- nls(y ~ a * exp(-b * x), start=list(a = 2, b = 0.01), algorithm="port")
 summary(fit3) 
@@ -146,7 +126,7 @@ b3 <- 0.04168
 fun3 <- function(x) {a3 * 2.718 ^ (-b3 * x)}
 
 
-# fitting for large seedling
+# fitting for large seedling nr # plot(d_prop$grass_total_beginning, d_prop$euc_large_end)
 x <- d_prop$grass_total_beginning
 y <- d_prop$euc_large_end
 fit4 <- nls(y ~ a * exp(-b * x), start=list(a = 13, b = 2), algorithm="port")
@@ -155,7 +135,7 @@ a4 <- 1.300e+01
 b4 <- 2.000e+00
 fun4 <- function(x) {a4 * 2.718 ^ (-b4 * x)}
 
-#### plotting ####
+#### Visualizing the relationship between original grass cover and final Euc cover / seedlin nr. ####
 # plotting
 pl <- d_prop %>% ggplot() +
   geom_point(aes(grass_total_beginning, euc_canopy_end), col = "red", size = 2) +
@@ -167,7 +147,7 @@ pl <- d_prop %>% ggplot() +
   stat_function(fun = fun3, col = "blue", size = 1, linetype = 2) +
   stat_function(fun = fun4, col = "darkblue", size = 1, linetype = 2) +
   
-  xlab("grass cover (%) winter 2006") +
+  xlab("Grass cover (%) winter 2006") +
   ylab("Euc. cover (%) & seedlings (nr.) autumn 2007") +
   theme_bw() # +
   # ggtitle("Influence of initial grass cover on Eucalyptus growth")
@@ -192,8 +172,6 @@ pl
 ggsave("figs/grass-vs-euc.png", pl, width = 5, height = 4)
 # original grass cover exponentially decreases eucalyptus cover and seedling abundance
 
-unique(d$Date)
-# - potential factors explaining are... and will be taken into account
 
 #### observed vs. predicted ####
 # canopy
@@ -220,8 +198,138 @@ pre4 <- a4 * exp(-b4 * d_prop$grass_total_beginning)
 #plot(obs4, pre4)
 cor.test(obs4, pre4, method = "pearson")
 
-# grass cover as whole tends to reduce Eucalyptus cover and seedling abundance
-# however, this is largely influcenced by confounders such as...
+# Result: Grass cover as whole tends to reduce Eucalyptus cover and seedling abundance
+# however, this is largely influcenced by confounders such as... see part 2
 
 # single species should be looked at to see a clearer trend
+
+
+#### Exploring further ####
+ggplot(d_prop, aes(grass_total_beginning, euc_canopy_end)) +
+  geom_point() 
+ggplot(d_prop, aes(grass_exotic_beginning, euc_canopy_end)) +
+  geom_point() 
+ggplot(d_prop, aes(grass_native_beginning, euc_canopy_end)) +
+  geom_point() 
+
+
+
+ggplot(d_prop, aes(grass_total_beginning, euc_small_end)) +
+  geom_point() 
+ggplot(d_prop, aes(grass_exotic_beginning, euc_small_end)) +
+  geom_point() 
+ggplot(d_prop, aes(grass_native_beginning, euc_small_end)) +
+  geom_point() 
+
+
+
+ggplot(d_prop, aes(grass_total_beginning, euc_medium_end)) +
+  geom_point()
+ggplot(d_prop, aes(grass_exotic_beginning, euc_medium_end)) +
+  geom_point()
+ggplot(d_prop, aes(grass_native_beginning, euc_medium_end)) +
+  geom_point()
+
+
+ggplot(d_prop, aes(grass_total_beginning, euc_large_end)) +
+  geom_point() 
+ggplot(d_prop, aes(grass_exotic_beginning, euc_large_end)) +
+  geom_point() 
+ggplot(d_prop, aes(grass_native_beginning, euc_large_end)) +
+  geom_point() 
+
+
+# Result: the less exotic grasses the better the Euc can grow - the influence of native grasses is not consistent
+# seedlings behave similar, so can be combined
+
+ggplot(d_prop, aes(grass_exotic_beginning, euc_small_end + euc_medium_end + euc_large_end)) +
+  geom_point() 
+
+
+# so it is exotic grasses that consistently reduce all seedling sizes and canopy cover with no consistent influence on native grasses
+# finaly we should use:
+
+
+ggplot(d_prop, aes(grass_exotic_beginning, euc_small_end + euc_medium_end + euc_large_end)) +
+  geom_point() 
+
+ 
+
+#### 1st FINAL GRAPH ####
+# fitting for Euc canopy cover
+x <- d_prop$grass_exotic_beginning 
+y <- d_prop$euc_canopy_end
+fit1 <- nls(y ~ a * exp(-b * x), start=list(a = 15, b = 2), algorithm="port")
+summary(fit1) # 
+a1 <- 13.84565
+b1 <- 0.07314
+fun1 <- function(x) {a1 * 2.718 ^ (-b1 * x)}
+
+ggplot(d_prop, aes(grass_exotic_beginning, euc_canopy_end)) +
+  geom_point()
+
+pl1 <- d_prop %>% ggplot() +
+  geom_point(aes(grass_exotic_beginning, euc_canopy_end), col = "grey", size = 2) +
+  stat_function(fun = fun1, col = "black", size = 1, linetype = 2) +
+  theme_bw() +
+  xlab("Grass cover of exotic grasses (%) Winter 2006") +
+  ylab("Eucalyptus canopy cover (%) Autumn 2007") +
+  scale_x_reverse()
+pl1
+
+# stats
+obs1 <- d_prop$euc_canopy_end
+pre1 <- a1 * exp(-b1 * d_prop$grass_exotic_beginning)
+cor.test(obs1, pre1, method = "pearson")
+
+pl1 <- pl1 +
+  annotate("text", x = 35, y = 17, label = "p < 0.01, R = 0.61", size = 4) 
+pl1
+
+ggsave("figs/ex_grasses_canopy.png", pl2, width = 5, height = 4)
+
+#### 2ND FINAL GRAPH ####
+# fitting for Euc seedlings
+
+d_prop <- d_prop %>% mutate(euc_allsize_end =  euc_small_end + euc_medium_end + euc_large_end)
+
+x <- d_prop$grass_exotic_beginning 
+y <- d_prop$euc_allsize_end
+fit1 <- nls(y ~ a * exp(-b * x), start=list(a = 15, b = 2), algorithm="port")
+summary(fit1) # 
+a2 <- 8.7115
+b2 <- 0.1642
+fun1 <- function(x) {a2 * 2.718 ^ (-b2 * x)}
+
+ggplot(d_prop, aes(grass_exotic_beginning, euc_allsize_end)) +
+  geom_point()
+
+pl2 <- d_prop %>% ggplot() +
+  geom_point(aes(grass_exotic_beginning, euc_allsize_end), col = "grey", size = 2) +
+  stat_function(fun = fun1, col = "black", size = 1, linetype = 2) +
+  theme_bw() +
+  xlab("Grass cover of exotic grasses (%) Winter 2006") +
+  ylab("Eucalyptus seedlings all sizes (nr.) Autumn 2007") +
+  scale_x_reverse()
+pl2
+
+# stats
+obs2 <- d_prop$euc_allsize_end
+pre2 <- a2 * exp(-b2 * d_prop$grass_exotic_beginning)
+cor.test(obs2, pre2, method = "pearson")
+
+pl2 <- pl2 +
+  annotate("text", x = 35, y = 17, label = "p < 0.05, R = 0.48", size = 4) 
+pl2
+
+ggsave("figs/ex_grasses_seedlings.png", pl2, width = 5, height = 4)
+
+p_together <- grid.arrange(pl1, pl2, ncol = 2)
+ggsave("figs/ex_grasses_euc.png", p_together, width = 8, height = 4)
+
+
+# to summarize: it is the exotic grasses which have a consistent effect on eucolyptus growth, not the native ones.
+# the seedling sizes can be combines into a new measure.
+
+# Conclusion: presence of exotic grasses reduce eucalyptus growth.
 
