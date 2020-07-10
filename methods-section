@@ -1,15 +1,19 @@
-Analysis was done in R 3.5.1. (curve-fitting).
+METHODS
 
-All grasses were combined into a separate variable (total grass cover). Also, each native grasses and exotic grasses were combined into separate variables. In order to see the general relationship between total grass cover and Eucalyptus growth, we plotted total grass cover with small, medium and large Eucalyptus seedlings as well as Eucalyptus canopy cover. 
+a - Data selection and curve-fitting
 
-Since these relationships have a generally negative direction, (->result)
+All grasses (exotic, native, annual, perennial) were at first combined into the separate variable which we call 'total grass cover'. The set of variables consisting of small, medium and large Eucalyptus seedlings as well as Eucalyptus canopy cover, we call 'Eucalyptus growth'. To proceed with our analysis, we first tested whether a) Eucalyptus growth would differ after almost two years (Winter 2006 to Autumn 2007) and b) if there was a general relationship between grasses and Eucalyptus presence (Fig. 1). When both showed to be true, we generated a dataset that included the grasses data from Winter 2006 as well as the Eucalyptus growth data from Autumn 2007 because we were interested how initial grass cover would affect Eucalyptus growth later on. Since on plot-level there was often zero Eucalyptus, we decided to group and summarize the data on property level. In this data set, we also split up exotic (annual and perennial) and native (annual and perennial) grass cover. Next, we visually explored all combinations of grass cover (total, exotic, native) with all combinations of Eucalptus growth (canopy, small, medium and large seedlings). Since only exotic grasses showed a consistent effect on Eucalyptus growth and all seedling sizes behaved comparbly, we went on with detailed analysis and curve fitting for canopy and a all seddlings vs. exotic grass cover (depicted in Fig. 2). For curve fitting with the non-linear least squarte method (nls() function), we chose an exponential decay equation of the shape a * exp(-b * x). Pearson correlation was used to assess the relationship of fitted vs. observed values. Analysis was done in R 3.5.1.
 
-but include many plots which have zero Eucalyptus, we decided to group and summarize the data on property level. Additionally, since we were interested in the effect of orginal grass cover in Winter 2016 on the growth of Eucalyptus, which was last measured in Autumn 2017, we used the data on grasses from Winter 2016 and that of Eucalyptus in Autumn 2017. Data was then plotted separately for Eucalyptus canopy cover and all seedling sizes with total grass cover, native grass cover and exotic grass cover. The effects of grass cover on all seedling sizes were consistent so we combined them into a single variable.
+b - confounding effects
 
-While total grass cover and native grass cover hat no consistent effect on Eucalyptus growth, exotic grass cover did. (->result)
+[Bernd]
 
-For curve fitting with the non-linear least squarte method (nls() function), we chose an exponential decay equation of the shape a * exp(-b * x). Pearson correlation was used to assess the relationship of fitted vs. observed values.
+RESULTS
 
+a - Effect of grass cover on Eucalyptus growth 
 
+We found an overall negative influence of total grass cover on Eucalyptus growth, which, on plot-level was blanketed by many plots with no Eucalyptus present (Fig. 1). Clearer trends were observed on property level. While total grass cover and native grass cover hat no consistent effect on Eucalyptus growth, exotic grass cover in the Winter of 2006 srongly reduced both Eucalyptus canopy cover and Eucaylptus seedling number of all sizes (Fig. 2 p < 0.05). 
 
+b - Influence of site parameters on Eucalyptus growth 
 
+[Bernd]
